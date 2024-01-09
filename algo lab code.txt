@@ -1,0 +1,139 @@
+package com.mycompany.todolistapp;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+class Task implements Serializable {
+    private String description;
+    private boolean isCompleted;
+
+    public Task(String description) {
+        this.description = description;
+        this.isCompleted = false;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public boolean isCompleted() {
+        return isCompleted;
+    }
+
+    public void markAsCompleted() {
+        isCompleted = true;
+    }
+
+    @Override
+    public String toString() {
+        return "[" + (isCompleted ? "X" : " ") + "] " + description;
+    }
+}
+
+class ToDoList implements Serializable {
+    private ArrayList<Task> tasks;
+
+    public ToDoList() {
+        tasks = new ArrayList<>();
+    }
+
+    public void addTask(Task task) {
+        tasks.add(task);
+    }
+
+    public void displayTasks() {
+        if (tasks.isEmpty()) {
+            System.out.println("No tasks in the to-do list.");
+        } else {
+            for (int i = 0; i < tasks.size(); i++) {
+                System.out.println((i + 1) + ". " + tasks.get(i));
+            }
+        }
+    }
+
+    public void markTaskAsCompleted(int index) {
+        if (index >= 1 && index <= tasks.size()) {
+            tasks.get(index - 1).markAsCompleted();
+            System.out.println("Task marked as completed: " + tasks.get(index - 1).getDescription());
+        } else {
+            System.out.println("Invalid task index.");
+        }
+    }
+
+    public void saveToFile(String fileName) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fileName))) {
+            oos.writeObject(tasks);
+            System.out.println("To-do list saved to " + fileName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public void loadFromFile(String fileName) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileName))) {
+            tasks = (ArrayList<Task>) ois.readObject();
+            System.out.println("To-do list loaded from " + fileName);
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+public class ToDoListApp {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        ToDoList toDoList = new ToDoList();
+
+        while (true) {
+            System.out.println("MD ARIF ISTIAQ");
+            System.out.println("\n===== To-Do List Menu =====");
+            System.out.println("1. Add Task");
+            System.out.println("2. Display Tasks");
+            System.out.println("3. Mark Task as Completed");
+            System.out.println("4. Save To-Do List to File");
+            System.out.println("5. Load To-Do List from File");
+            System.out.println("6. Exit");
+
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume the newline character
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter task description: ");
+                    String description = scanner.nextLine();
+                    toDoList.addTask(new Task(description));
+                    System.out.println("Task added successfully!");
+                    break;
+                case 2:
+                    toDoList.displayTasks();
+                    break;
+                case 3:
+                    System.out.print("Enter the index of the task to mark as completed: ");
+                    int index = scanner.nextInt();
+                    toDoList.markTaskAsCompleted(index);
+                    break;
+                case 4:
+                    System.out.print("Enter the file name to save the to-do list: ");
+                    String saveFileName = scanner.nextLine();
+                    toDoList.saveToFile(saveFileName);
+                    break;
+                case 5:
+                    System.out.print("Enter the file name to load the to-do list: ");
+                    String loadFileName = scanner.nextLine();
+                    toDoList.loadFromFile(loadFileName);
+                    break;
+                case 6:
+                    System.out.println("Exiting the To-Do List Application. Goodbye!");
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please enter a valid option.");
+            }
+        }
+       
+    }
+}
